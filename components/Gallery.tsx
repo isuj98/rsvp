@@ -40,6 +40,43 @@ const Gallery: React.FC = () => {
     }
   };
 
+  // Prevent image download
+  const preventDownload = (e: React.MouseEvent | React.DragEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  };
+
+  // Prevent context menu (right-click)
+  const preventContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    return false;
+  };
+
+  // Prevent keyboard shortcuts for saving/printing
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent Ctrl+S, Ctrl+P, Ctrl+Shift+I, F12, etc.
+      if (
+        (e.ctrlKey || e.metaKey) && 
+        (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P' || e.key === 'i' || e.key === 'I')
+      ) {
+        e.preventDefault();
+        return false;
+      }
+      // Prevent F12 (DevTools)
+      if (e.key === 'F12') {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <>
       <div id="gallery" className="w-full py-12 md:py-20 lg:py-24 px-4">
@@ -67,14 +104,27 @@ const Gallery: React.FC = () => {
                 className="w-full"
               >
                 <div 
-                  className="group relative overflow-hidden shadow-2xl rounded-sm bg-white p-1.5 md:p-3 aspect-[3/4] sm:aspect-square md:aspect-[4/5] cursor-pointer"
+                  className="group relative overflow-hidden shadow-2xl rounded-sm bg-white p-1.5 md:p-3 aspect-[3/4] sm:aspect-square md:aspect-[4/5] cursor-pointer select-none"
                   onClick={() => openModal(index)}
+                  onContextMenu={preventContextMenu}
+                  onDragStart={preventDownload}
+                  onSelectStart={preventDownload}
                 >
                   <img 
                     src={image.url} 
-                    alt={image.caption || `Gallery image ${index + 1}`} 
-                    className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+                    alt={(image as any).caption || `Gallery image ${index + 1}`} 
+                    className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110 pointer-events-none select-none"
                     loading="lazy"
+                    draggable={false}
+                    onContextMenu={preventContextMenu}
+                    onDragStart={preventDownload}
+                    onSelectStart={preventDownload}
+                  />
+                  {/* Invisible overlay to prevent direct image access */}
+                  <div 
+                    className="absolute inset-0 z-10"
+                    onContextMenu={preventContextMenu}
+                    onDragStart={preventDownload}
                   />
                 </div>
               </Reveal>
@@ -106,18 +156,32 @@ const Gallery: React.FC = () => {
               </svg>
             </button>
 
-            {/* Image */}
-            <img 
-              src={GALLERY_IMAGES[selectedImage].url} 
-              alt={GALLERY_IMAGES[selectedImage].caption || `Gallery image ${selectedImage + 1}`}
-              className="max-w-full max-h-full object-contain rounded-sm shadow-2xl"
-            />
+            {/* Image with protection overlay */}
+            <div className="relative max-w-full max-h-full">
+              <img 
+                src={GALLERY_IMAGES[selectedImage].url} 
+                alt={(GALLERY_IMAGES[selectedImage] as any).caption || `Gallery image ${selectedImage + 1}`}
+                className="max-w-full max-h-full object-contain rounded-sm shadow-2xl pointer-events-none select-none"
+                draggable={false}
+                onContextMenu={preventContextMenu}
+                onDragStart={preventDownload}
+                onSelectStart={preventDownload}
+              />
+              {/* Invisible overlay to prevent direct image access */}
+              <div 
+                className="absolute inset-0 z-10"
+                onContextMenu={preventContextMenu}
+                onDragStart={preventDownload}
+                onMouseDown={preventDownload}
+                onTouchStart={preventDownload}
+              />
+            </div>
 
             {/* Caption */}
-            {GALLERY_IMAGES[selectedImage].caption && (
+            {(GALLERY_IMAGES[selectedImage] as any).caption && (
               <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 md:px-8 py-3 md:py-4 rounded-sm">
                 <p className="text-white font-serif-elegant text-sm md:text-lg italic tracking-widest text-center">
-                  {GALLERY_IMAGES[selectedImage].caption}
+                  {(GALLERY_IMAGES[selectedImage] as any).caption}
                 </p>
               </div>
             )}
@@ -136,6 +200,43 @@ const Gallery: React.FC = () => {
         }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-in-out;
+        }
+        /* Prevent image selection and dragging */
+        #gallery img,
+        #gallery img::selection,
+        #gallery img::-moz-selection {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          -webkit-user-drag: none;
+          -khtml-user-drag: none;
+          -moz-user-drag: none;
+          -o-user-drag: none;
+          user-drag: none;
+          pointer-events: none;
+        }
+        /* Prevent text selection on gallery container */
+        #gallery {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+        /* Prevent image download in modal */
+        [class*="fixed inset-0 z-50"] img,
+        [class*="fixed inset-0 z-50"] img::selection,
+        [class*="fixed inset-0 z-50"] img::-moz-selection {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          -webkit-user-drag: none;
+          -khtml-user-drag: none;
+          -moz-user-drag: none;
+          -o-user-drag: none;
+          user-drag: none;
+          pointer-events: none;
         }
       `}</style>
     </>
