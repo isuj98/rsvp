@@ -34,12 +34,10 @@ const RSVPForm: React.FC = () => {
     const normalizedSearch = searchName.trim().toLowerCase();
     
     const matchedGuest = dynamicGuestList.find(name => 
-      name.toLowerCase() === normalizedSearch || 
-      normalizedSearch.includes(name.toLowerCase()) ||
-      name.toLowerCase().includes(normalizedSearch)
+      name.toLowerCase() === normalizedSearch
     );
 
-    if (matchedGuest && normalizedSearch.length > 3) {
+    if (matchedGuest) {
       setFormState({ ...formState, guestName: matchedGuest });
       setStep(2);
       setError(null);
