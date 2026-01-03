@@ -7,6 +7,7 @@ import Reveal from './Reveal';
 const RSVPForm: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const [searchName, setSearchName] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dynamicGuestList, setDynamicGuestList] = useState<string[]>([]);
   
@@ -20,16 +21,18 @@ const RSVPForm: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    // Sync guest list from the local 'guestlist.json' proxy
-    const list = JSON.parse(localStorage.getItem('wedding_guest_list') || '[]');
-    setDynamicGuestList(list);
+    // Load authorized guest list from MongoDB API
+    fetch('/api/guests')
+      .then(res => res.json())
+      .then(data => setDynamicGuestList(data))
+      .catch(err => console.error("Failed to load guests from DB", err));
   }, []);
 
   const handleValidation = (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     const normalizedSearch = searchName.trim().toLowerCase();
     
-    // Check against authorized guest list
     const matchedGuest = dynamicGuestList.find(name => 
       name.toLowerCase() === normalizedSearch || 
       normalizedSearch.includes(name.toLowerCase()) ||
@@ -41,8 +44,9 @@ const RSVPForm: React.FC = () => {
       setStep(2);
       setError(null);
     } else {
-      setError("We couldn't find that name in our registry. Please check the spelling.");
+      setError("Name not found in our guest list. Please check the spelling on your invite.");
     }
+    setLoading(false);
   };
 
   const addCompanion = () => {
@@ -57,8 +61,9 @@ const RSVPForm: React.FC = () => {
     setCompanions(companions.map(c => c.id === id ? { ...c, name } : c));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
     const submission: RSVPData = {
       ...formState,
@@ -67,15 +72,21 @@ const RSVPForm: React.FC = () => {
     };
 
     try {
-      // PERMANENT STORAGE: Write data to the 'submissions.json' proxy
-      const existing = JSON.parse(localStorage.getItem('wedding_submissions') || '[]');
-      const filtered = existing.filter((s: RSVPData) => s.guestName !== submission.guestName);
-      localStorage.setItem('wedding_submissions', JSON.stringify([...filtered, submission]));
+      const res = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submission)
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setError("Failed to save RSVP. Please try again.");
+      }
     } catch (err) {
-      console.error("Critical error saving submission:", err);
+      setError("Network error. Please try again later.");
+    } finally {
+      setLoading(false);
     }
-
-    setSubmitted(true);
   };
 
   if (submitted) {
@@ -88,10 +99,12 @@ const RSVPForm: React.FC = () => {
             </svg>
           </div>
           <h2 className="text-5xl md:text-6xl font-script mb-6" style={{ color: COLORS.dark }}>Thank You</h2>
-          <p className="text-xl font-serif-elegant italic opacity-70 mb-10">Your response has been successfully recorded in our registry.</p>
+          <p className="text-xl font-serif-elegant italic opacity-70 mb-10 leading-relaxed">
+            Your response has been saved to our master database.<br/>We look forward to celebrating with you!
+          </p>
           <button 
             onClick={() => { setSubmitted(false); setStep(1); setSearchName(''); }}
-            className="text-[9px] uppercase tracking-[0.4em] font-bold border-b border-[#A67346]/40 pb-2 hover:border-[#A67346] transition-all"
+            className="text-[10px] uppercase tracking-[0.4em] font-bold border-b border-[#A67346]/40 pb-2 hover:border-[#A67346] transition-all"
             style={{ color: COLORS.accent }}
           >
             Update My Response
@@ -103,23 +116,23 @@ const RSVPForm: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center relative py-20 px-4 overflow-hidden">
-      {/* Dynamic Background with Color Palette */}
+      {/* Editorial Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[#F9F6F2]"></div>
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-[#BDD3E3] opacity-20 blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#F1CBA4] opacity-20 blur-[100px]"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/silk.png')] opacity-10 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#BDD3E3]/40 via-white/50 to-[#F1CBA4]/40"></div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/silk.png')] opacity-10 pointer-events-none"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-2xl">
         {step === 1 ? (
-          <Reveal animation="reveal-scale" className="bg-white/90 backdrop-blur-lg p-12 md:p-24 shadow-[0_50px_100px_rgba(0,0,0,0.08)] border border-stone-100 text-center relative overflow-hidden">
+          <Reveal animation="reveal-scale" className="bg-white/90 backdrop-blur-xl p-12 md:p-24 shadow-[0_60px_130px_rgba(0,0,0,0.08)] border border-stone-100 text-center relative overflow-hidden rounded-sm">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#BDD3E3] via-[#F1CBA4] to-[#BDD3E3]"></div>
             
             <div className="mb-16">
-              <span className="text-[10px] uppercase tracking-[0.6em] font-cinzel opacity-30 block mb-6">Reservation Verification</span>
-              <h2 className="text-6xl md:text-8xl font-script mb-4" style={{ color: COLORS.dark }}>RSVP</h2>
-              <p className="text-[10px] tracking-[0.4em] opacity-40 uppercase font-bold mt-8">Please enter your formal full name</p>
+              <span className="text-[10px] uppercase tracking-[0.6em] font-cinzel opacity-30 block mb-6">Reservation Access</span>
+              <h2 className="text-7xl md:text-9xl font-script mb-4" style={{ color: COLORS.dark }}>RSVP</h2>
+              <div className="w-12 h-[1px] bg-[#F1CBA4] mx-auto mt-12 opacity-40"></div>
+              <p className="text-[9px] tracking-[0.4em] opacity-40 uppercase font-black mt-12">Database Verification</p>
             </div>
 
             <form onSubmit={handleValidation} className="space-y-12">
@@ -127,10 +140,10 @@ const RSVPForm: React.FC = () => {
                 type="text"
                 required
                 autoFocus
-                className="w-full border-b-[1px] border-stone-200 py-6 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-3xl md:text-5xl italic text-center placeholder:opacity-5 text-stone-800"
+                className="w-full border-b-[1.5px] border-stone-200 py-6 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-3xl md:text-5xl italic text-center placeholder:opacity-5 text-stone-800"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
-                placeholder="Full Name"
+                placeholder="Full Formal Name"
               />
               
               {error && (
@@ -139,41 +152,42 @@ const RSVPForm: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-6 text-white uppercase tracking-[0.6em] text-[11px] font-bold shadow-2xl transition-all duration-700 hover:bg-stone-800"
+                disabled={loading}
+                className="w-full py-6 text-white uppercase tracking-[0.6em] text-[11px] font-bold shadow-2xl transition-all duration-700 hover:bg-stone-800 disabled:opacity-50"
                 style={{ backgroundColor: COLORS.dark }}
               >
-                Enter Portal
+                {loading ? 'Verifying...' : 'Access Portal'}
               </button>
             </form>
           </Reveal>
         ) : (
-          <Reveal animation="reveal-scale" className="bg-white/95 backdrop-blur-lg p-10 md:p-16 shadow-[0_50px_100px_rgba(0,0,0,0.08)] border border-stone-100 relative">
+          <Reveal animation="reveal-scale" className="bg-white/95 backdrop-blur-xl p-10 md:p-16 shadow-[0_60px_130px_rgba(0,0,0,0.08)] border border-stone-100 relative rounded-sm">
              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#BDD3E3] via-[#F1CBA4] to-[#BDD3E3]"></div>
              
-             <div className="text-center mb-12">
-               <h2 className="text-4xl md:text-5xl font-script mb-2" style={{ color: COLORS.dark }}>Welcome</h2>
-               <p className="text-lg font-serif-elegant italic text-[#A67346]">{formState.guestName}</p>
-               <div className="w-12 h-[1px] bg-stone-100 mx-auto mt-6"></div>
+             <div className="text-center mb-14">
+               <span className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 mb-2 block">Personal Invitation for</span>
+               <h2 className="text-3xl md:text-5xl font-script mb-2" style={{ color: COLORS.dark }}>{formState.guestName}</h2>
+               <div className="w-12 h-[1px] bg-[#F1CBA4] mx-auto mt-6"></div>
              </div>
 
              <form onSubmit={handleSubmit} className="space-y-10">
                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                  <div className="space-y-3">
-                   <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Mobile Number</label>
+                   <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Contact Number</label>
                    <input
                      type="tel"
                      required
-                     className="w-full border-b-[1px] border-stone-200 py-2 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-xl italic"
+                     className="w-full border-b-[1px] border-stone-200 py-3 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-xl italic"
                      value={formState.contactNumber}
                      onChange={(e) => setFormState({ ...formState, contactNumber: e.target.value })}
                      placeholder="+63"
                    />
                  </div>
 
-                 <div className="space-y-5">
-                   <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Will you attend?</label>
-                   <div className="flex space-x-8">
-                     <label className="flex items-center space-x-2 cursor-pointer group">
+                 <div className="space-y-6">
+                   <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Attendance</label>
+                   <div className="flex space-x-10">
+                     <label className="flex items-center space-x-3 cursor-pointer group">
                        <input
                          type="radio"
                          name="attending"
@@ -181,9 +195,9 @@ const RSVPForm: React.FC = () => {
                          checked={formState.isAttending === true}
                          onChange={() => setFormState({ ...formState, isAttending: true })}
                        />
-                       <span className="text-xs uppercase tracking-widest opacity-60 font-bold group-hover:opacity-100">Delighted</span>
+                       <span className="text-[11px] uppercase tracking-widest opacity-60 font-black group-hover:opacity-100">Delighted</span>
                      </label>
-                     <label className="flex items-center space-x-2 cursor-pointer group">
+                     <label className="flex items-center space-x-3 cursor-pointer group">
                        <input
                          type="radio"
                          name="attending"
@@ -191,31 +205,32 @@ const RSVPForm: React.FC = () => {
                          checked={formState.isAttending === false}
                          onChange={() => setFormState({ ...formState, isAttending: false })}
                        />
-                       <span className="text-xs uppercase tracking-widest opacity-60 font-bold group-hover:opacity-100">Declined</span>
+                       <span className="text-[11px] uppercase tracking-widest opacity-60 font-black group-hover:opacity-100">Declined</span>
                      </label>
                    </div>
                  </div>
                </div>
 
                {formState.isAttending && (
-                 <div className="space-y-6 pt-8 border-t border-stone-50">
+                 <div className="space-y-6 pt-10 border-t border-stone-50">
                    <div className="flex justify-between items-center">
                      <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Plus One / Companions</label>
-                     <button type="button" onClick={addCompanion} className="text-[8px] uppercase tracking-[0.3em] font-bold py-1.5 px-4 border border-stone-100 rounded-full hover:bg-stone-50 transition-all text-[#A67346]">+ Add Person</button>
+                     <button type="button" onClick={addCompanion} className="text-[9px] uppercase tracking-[0.2em] font-black py-2 px-5 border border-[#F1CBA4] rounded-full hover:bg-stone-50 transition-all text-[#A67346]">+ Add Person</button>
                    </div>
-                   
-                   <div className="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scroll">
+                   <div className="space-y-4 max-h-48 overflow-y-auto pr-4 custom-scroll">
                      {companions.map((comp) => (
-                       <div key={comp.id} className="flex items-center space-x-3 bg-stone-50/50 p-3 rounded-sm">
+                       <div key={comp.id} className="flex items-center space-x-4 bg-stone-50/50 p-4 rounded-sm border border-stone-100/20">
                          <input
                            type="text"
                            required
                            placeholder="Full Name"
-                           className="flex-1 border-b-[1px] border-transparent py-1 text-sm focus:outline-none focus:border-[#F1CBA4] italic font-serif-elegant bg-transparent"
+                           className="flex-1 border-b-[1px] border-transparent py-1 text-base focus:outline-none focus:border-[#F1CBA4] italic font-serif-elegant bg-transparent"
                            value={comp.name}
                            onChange={(e) => updateCompanion(comp.id, e.target.value)}
                          />
-                         <button type="button" onClick={() => removeCompanion(comp.id)} className="text-stone-300 hover:text-red-400">×</button>
+                         <button type="button" onClick={() => removeCompanion(comp.id)} className="text-stone-300 hover:text-red-400">
+                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                         </button>
                        </div>
                      ))}
                    </div>
@@ -223,9 +238,9 @@ const RSVPForm: React.FC = () => {
                )}
 
                <div className="space-y-3">
-                 <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Message for the Couple</label>
+                 <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">A note for the couple</label>
                  <textarea
-                   className="w-full border-b-[1px] border-stone-200 py-2 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-lg italic min-h-[80px] resize-none"
+                   className="w-full border-b-[1px] border-stone-200 py-3 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-lg italic min-h-[100px] resize-none"
                    value={formState.message}
                    onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                    placeholder="Your well wishes..."
@@ -234,10 +249,11 @@ const RSVPForm: React.FC = () => {
 
                <button
                  type="submit"
-                 className="w-full py-6 text-white uppercase tracking-[0.6em] text-[11px] font-bold shadow-2xl transition-all duration-700 hover:scale-[1.01] transform"
+                 disabled={loading}
+                 className="w-full py-6 text-white uppercase tracking-[0.6em] text-[11px] font-bold shadow-2xl transition-all duration-700 hover:scale-[1.01] transform disabled:opacity-50"
                  style={{ backgroundColor: COLORS.dark }}
                >
-                 Confirm Reservation
+                 {loading ? 'Processing...' : 'Confirm Reservation'}
                </button>
              </form>
           </Reveal>

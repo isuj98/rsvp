@@ -19,47 +19,14 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Session persistence
     const session = localStorage.getItem('wedding_admin_session');
     if (session === 'true') {
       setIsAuthenticated(true);
     }
 
-    // Initialize state from external JSON files if not in storage
-    const initData = async () => {
-      // Guest List Init
-      if (!localStorage.getItem('wedding_guest_list')) {
-        try {
-          const response = await fetch('/guestlist.json');
-          const data = await response.json();
-          localStorage.setItem('wedding_guest_list', JSON.stringify(data));
-        } catch (e) {
-          console.error("Failed to load initial guest list", e);
-        }
-      }
-      
-      // Submissions Init
-      if (!localStorage.getItem('wedding_submissions')) {
-        try {
-          const response = await fetch('/submissions.json');
-          if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('wedding_submissions', JSON.stringify(data));
-          } else {
-            localStorage.setItem('wedding_submissions', '[]');
-          }
-        } catch (e) {
-          localStorage.setItem('wedding_submissions', '[]');
-        }
-      }
-    };
-
-    initData();
-
     const handleRouting = () => {
       const path = window.location.pathname.toLowerCase();
       const hash = window.location.hash.toLowerCase();
-      
       if (path.includes('login') || hash.includes('login')) {
         setActiveSection('login');
       }
@@ -81,7 +48,6 @@ const App: React.FC = () => {
       setActiveSection(section);
       setIsTransitioning(false);
       window.scrollTo(0, 0);
-      
       if (section === 'login' || section === 'dashboard') {
         window.history.pushState({}, '', '/login');
       } else if (section === 'hero') {
@@ -109,23 +75,11 @@ const App: React.FC = () => {
       case 'hub':
         return <NavigationHub onNavigate={navigateTo} onBackToHero={() => navigateTo('hero')} />;
       case 'moments':
-        return (
-          <div className="min-h-screen bg-white py-10">
-            <Gallery />
-          </div>
-        );
+        return <div className="min-h-screen bg-white py-10"><Gallery /></div>;
       case 'venue':
-        return (
-          <div className="min-h-screen bg-white">
-            <Venue />
-          </div>
-        );
+        return <div className="min-h-screen bg-white"><Venue /></div>;
       case 'details':
-        return (
-          <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center py-20">
-            <DetailsSection />
-          </div>
-        );
+        return <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center py-20"><DetailsSection /></div>;
       case 'rsvp':
         return (
           <div className="min-h-screen bg-[#F9F6F2] flex flex-col items-center justify-center py-20 px-4 relative overflow-hidden">
