@@ -29,10 +29,10 @@ export const WEDDING_DETAILS = {
 };
 
 export const GALLERY_IMAGES = [
-  { url: 'images/11.jpg', caption: 'Our Beginning' },
-  { url: 'images/22.jpg', caption: 'The Proposal' },
-  { url: 'images/33.jpg', caption: 'Our Beginning' },
-  { url: 'images/44.jpg', caption: 'The Proposal' },
-  { url: 'images/55.jpg', caption: 'Our Beginning' },
-  { url: 'images/66.jpg', caption: 'The Proposal' },
+  { url: 'images/11.jpg' },
+  { url: 'images/22.jpg' },
+  { url: 'images/33.jpg' },
+  { url: 'images/44.jpg' },
+  { url: 'images/55.jpg' },
+  { url: 'images/66.jpg' },
 ];
