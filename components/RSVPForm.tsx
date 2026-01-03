@@ -48,7 +48,9 @@ const RSVPForm: React.FC = () => {
   };
 
   const addCompanion = () => {
-    setCompanions([...companions, { id: Date.now().toString(), name: '' }]);
+    if (companions.length === 0) {
+      setCompanions([{ id: Date.now().toString(), name: '' }]);
+    }
   };
 
   const removeCompanion = (id: string) => {
@@ -212,10 +214,12 @@ const RSVPForm: React.FC = () => {
                {formState.isAttending && (
                  <div className="space-y-6 pt-10 border-t border-stone-50">
                    <div className="flex justify-between items-center">
-                     <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Plus One / Companions</label>
-                     <button type="button" onClick={addCompanion} className="text-[9px] uppercase tracking-[0.2em] font-black py-2 px-5 border border-[#F1CBA4] rounded-full hover:bg-stone-50 transition-all text-[#A67346]">+ Add Person</button>
+                     <label className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block">Plus One</label>
+                     {companions.length === 0 && (
+                       <button type="button" onClick={addCompanion} className="text-[9px] uppercase tracking-[0.2em] font-black py-2 px-5 border border-[#F1CBA4] rounded-full hover:bg-stone-50 transition-all text-[#A67346]">+ Add Person</button>
+                     )}
                    </div>
-                   <div className="space-y-4 max-h-48 overflow-y-auto pr-4 custom-scroll">
+                   <div className="space-y-4">
                      {companions.map((comp) => (
                        <div key={comp.id} className="flex items-center space-x-4 bg-stone-50/50 p-4 rounded-sm border border-stone-100/20">
                          <input
