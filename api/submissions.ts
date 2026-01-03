@@ -3,23 +3,28 @@ import { MongoClient } from 'mongodb';
 
 const uri = "mongodb+srv://justinejusi98_db_user:QMXbwUXOrYvXPHMo@rsvp.porkr0i.mongodb.net/admin?retryWrites=true&w=majority";
 
-// Cache the client globally for serverless functions
-let clientPromise: Promise<MongoClient>;
+// Cache the client globally for Vercel serverless functions
+// This pattern reuses connections across function invocations
+const client = new MongoClient(uri, {
+  maxPoolSize: 10,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+});
 
-if (!clientPromise) {
-  const client = new MongoClient(uri, {
-    maxPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
-  });
-  clientPromise = client.connect();
+let clientPromise: Promise<MongoClient> | null = null;
+
+function getClient(): Promise<MongoClient> {
+  if (!clientPromise) {
+    clientPromise = client.connect();
+  }
+  return clientPromise;
 }
 
 export default async function handler(req: any, res: any) {
   try {
-    // Use the cached connection
-    const client = await clientPromise;
-    const db = client.db('wedding');
+    // Use the cached connection for Vercel serverless functions
+    const mongoClient = await getClient();
+    const db = mongoClient.db('wedding');
     const collection = db.collection('submissions');
 
     if (req.method === 'GET') {
