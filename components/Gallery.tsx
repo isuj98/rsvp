@@ -76,11 +76,6 @@ const Gallery: React.FC = () => {
                     className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 md:p-8">
-                    <p className="text-white font-serif-elegant text-sm md:text-lg italic tracking-widest translate-y-4 group-hover:translate-y-0 transition-transform duration-700 font-bold">
-                      {image.caption || 'Click to enlarge'}
-                    </p>
-                  </div>
                 </div>
               </Reveal>
             ))}
