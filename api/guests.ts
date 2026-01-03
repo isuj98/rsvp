@@ -1,7 +1,7 @@
 
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI || "mongodb+srv://justinejusi98_db_user:QMXbwUXOrYvXPHMo@rsvp.porkr0i.mongodb.net/admin?retryWrites=true&w=majority";
+const uri = "mongodb+srv://justinejusi98_db_user:QMXbwUXOrYvXPHMo@rsvp.porkr0i.mongodb.net/admin?retryWrites=true&w=majority";
 
 // Cache the client globally for serverless functions
 let clientPromise: Promise<MongoClient>;
