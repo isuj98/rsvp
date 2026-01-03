@@ -90,10 +90,10 @@ const Gallery: React.FC = () => {
           onClick={handleBackdropClick}
         >
           <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
-            {/* Close Button */}
+            {/* Close Button - moved to left */}
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 md:top-8 md:right-8 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md transition-all duration-300 group"
+              className="absolute top-4 left-4 md:top-8 md:left-8 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md transition-all duration-300 group"
               aria-label="Close modal"
             >
               <svg 
