@@ -1,0 +1,74 @@
+
+import React from 'react';
+import { COLORS, WEDDING_DETAILS } from '../constants';
+import Reveal from './Reveal';
+
+const DetailsSection: React.FC = () => {
+  return (
+    <div className="w-full max-w-4xl mx-auto py-24 px-6 md:px-12 relative overflow-hidden">
+      {/* Delicate Corner Decorations */}
+      <div className="absolute top-8 left-8 w-24 h-24 border-t border-l border-[#A67346]/20"></div>
+      <div className="absolute bottom-8 right-8 w-24 h-24 border-b border-r border-[#A67346]/20"></div>
+
+      <div className="relative z-10 flex flex-col items-center text-center">
+        {/* "Details" Header */}
+        <Reveal>
+          <span className="text-[11px] uppercase tracking-[0.6em] font-cinzel mb-4 block" style={{ color: COLORS.accent }}>Essential Info</span>
+          <h1 className="text-8xl md:text-9xl font-script mb-20" style={{ color: COLORS.dark }}>
+            Details
+          </h1>
+        </Reveal>
+
+        <div className="w-full flex flex-col md:flex-row gap-16 md:gap-0 justify-between items-center md:items-start mb-24 max-w-3xl">
+          {/* GIFT Section */}
+          <Reveal delay={200} className="md:w-5/12 text-center md:text-right">
+            <h2 className="text-2xl md:text-3xl font-serif-elegant tracking-[0.2em] mb-6 font-bold" style={{ color: COLORS.accent }}>G I F T</h2>
+            <p className="text-base md:text-lg italic font-serif-elegant leading-relaxed opacity-80" style={{ color: COLORS.text }}>
+              With all that we have,<br/> we've been truly blessed.<br/>
+              Your presence and prayers<br/> are all that we request.<br/>
+              But if you desire to give nonetheless,<br/>
+              <span className="font-bold">Monetary gift</span> is one we suggest.
+            </p>
+          </Reveal>
+
+          {/* Vertical Divider */}
+          <div className="hidden md:block w-px h-48 bg-gradient-to-b from-transparent via-[#A67346]/10 to-transparent"></div>
+
+          {/* ATTIRE Section */}
+          <Reveal delay={350} className="md:w-5/12 text-center md:text-left">
+            <h2 className="text-2xl md:text-3xl font-serif-elegant tracking-[0.2em] mb-6 font-bold" style={{ color: COLORS.accent }}>A T T I R E</h2>
+            <p className="text-[11px] uppercase tracking-[0.4em] font-bold mb-8" style={{ color: COLORS.dark }}>SEMI-FORMAL / SMART CASUAL</p>
+            
+            {/* Palette Circles */}
+            <div className="flex justify-center md:justify-start space-x-3 mb-10">
+              {COLORS.palette.map((color, idx) => (
+                <div 
+                  key={idx} 
+                  className="w-8 h-8 md:w-10 md:h-10 rounded-full shadow-inner border border-white/40 transform transition-transform duration-500 hover:scale-125 hover:z-10 cursor-help"
+                  style={{ backgroundColor: color }}
+                  title={`Color ${idx + 1}`}
+                />
+              ))}
+            </div>
+            
+            <p className="text-sm md:text-base italic font-serif-elegant leading-relaxed opacity-70" style={{ color: COLORS.text }}>
+              We are kindly asking our favorite people to join us<br/>
+              in wearing our <span className="font-bold">wedding colors</span>.
+            </p>
+          </Reveal>
+        </div>
+
+        {/* Decorative flourish */}
+        <Reveal delay={500} className="opacity-40">
+           <svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+             <path d="M0 20C40 20 60 5 100 5C140 5 160 20 200 20" stroke={COLORS.accent} strokeWidth="0.5"/>
+             <path d="M0 25C40 25 60 10 100 10C140 10 160 25 200 25" stroke={COLORS.primary} strokeWidth="0.5"/>
+             <circle cx="100" cy="15" r="4" fill={COLORS.accent} fillOpacity="0.5"/>
+           </svg>
+        </Reveal>
+      </div>
+    </div>
+  );
+};
+
+export default DetailsSection;

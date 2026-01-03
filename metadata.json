@@ -1,0 +1,7 @@
+{
+  "name": "Johnsean & Kristine's Wedding Invitation",
+  "description": "An elegant, responsive wedding invitation and RSVP portal featuring a custom color palette, background music, gallery, and interactive RSVP form.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
