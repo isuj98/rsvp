@@ -1,12 +1,24 @@
 
 import { MongoClient } from 'mongodb';
 
-const uri = "mongodb+srv://justinejusi98_db_user:QMXbwUXOrYvXPHMo@rsvp.porkr0i.mongodb.net/admin";
-const client = new MongoClient(uri);
+const uri = process.env.MONGODB_URI || "mongodb+srv://justinejusi98_db_user:QMXbwUXOrYvXPHMo@rsvp.porkr0i.mongodb.net/admin?retryWrites=true&w=majority";
+
+// Cache the client globally for serverless functions
+let clientPromise: Promise<MongoClient>;
+
+if (!clientPromise) {
+  const client = new MongoClient(uri, {
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+  });
+  clientPromise = client.connect();
+}
 
 export default async function handler(req: any, res: any) {
   try {
-    await client.connect();
+    // Use the cached connection
+    const client = await clientPromise;
     const db = client.db('wedding');
     const collection = db.collection('guests');
 
@@ -37,9 +49,8 @@ export default async function handler(req: any, res: any) {
     res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: 'Database connection failed' });
-  } finally {
-    await client.close();
+    console.error('MongoDB error:', e);
+    res.status(500).json({ error: 'Database connection failed', details: e instanceof Error ? e.message : 'Unknown error' });
   }
+  // Don't close the connection - let it be reused in serverless environment
 }
