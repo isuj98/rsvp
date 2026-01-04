@@ -129,10 +129,9 @@ const RSVPForm: React.FC = () => {
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#BDD3E3] via-[#F1CBA4] to-[#BDD3E3]"></div>
             
             <div className="mb-16">
-              <span className="text-[10px] uppercase tracking-[0.6em] font-cinzel opacity-30 block mb-6">Reservation Access</span>
+              <span className="text-[10px] uppercase tracking-[0.6em] font-cinzel opacity-100 block mb-6">Reservation Access</span>
               <h2 className="text-7xl md:text-9xl font-script mb-4" style={{ color: COLORS.dark }}>RSVP</h2>
               <div className="w-12 h-[1px] bg-[#F1CBA4] mx-auto mt-12 opacity-40"></div>
-              <p className="text-[9px] tracking-[0.4em] opacity-40 uppercase font-black mt-12">Database Verification</p>
             </div>
 
             <form onSubmit={handleValidation} className="space-y-12">
@@ -140,10 +139,10 @@ const RSVPForm: React.FC = () => {
                 type="text"
                 required
                 autoFocus
-                className="w-full border-b-[1.5px] border-stone-200 py-6 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-3xl md:text-5xl italic text-center placeholder:opacity-5 text-stone-800"
+                className="w-full border-b-[1.5px] border-stone-200 py-6 focus:outline-none focus:border-[#A67346] transition-all bg-transparent font-serif-elegant text-3xl md:text-5xl italic text-center placeholder:opacity-70 text-stone-800"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
-                placeholder="Full Formal Name"
+                placeholder="Enter your name here"
               />
               
               {error && (
