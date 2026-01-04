@@ -38,5 +38,5 @@ export const GALLERY_IMAGES = [
   { url: 'images/0007.jpg' },
   { url: 'images/0008.jpg' },
   { url: 'images/0009.jpg' },
-  { url: 'images/0010.jpg' },
+  { url: 'images/00010.jpg' },
 ];
