@@ -17,10 +17,34 @@ const Gallery: React.FC = () => {
     return shuffled;
   };
 
-  // Shuffle images on component mount
+  // Shuffle images on component mount and ensure 88.jpg and 113.jpg are in left center positions
   useEffect(() => {
     const imagesToShow = GALLERY_IMAGES.slice(0, 12);
-    setShuffledImages(shuffleArray(imagesToShow));
+    const shuffled = shuffleArray(imagesToShow);
+    
+    // Left center positions in a 3-column grid: indices 3, 6 (left column of rows 2 and 3)
+    const targetPos88 = 3;
+    const targetPos113 = 6;
+    
+    // Find current positions of 88.jpg and 113.jpg
+    const image88Index = shuffled.findIndex(img => img.url === 'images/88.jpg');
+    const image113Index = shuffled.findIndex(img => img.url === 'images/113.jpg');
+    
+    // Place 88.jpg at position 3 (left center, row 2)
+    if (image88Index !== -1 && image88Index !== targetPos88) {
+      [shuffled[image88Index], shuffled[targetPos88]] = 
+        [shuffled[targetPos88], shuffled[image88Index]];
+    }
+    
+    // Place 113.jpg at position 6 (left center, row 3)
+    // Find it again in case it moved during the previous swap
+    const current113Index = shuffled.findIndex(img => img.url === 'images/113.jpg');
+    if (current113Index !== -1 && current113Index !== targetPos113) {
+      [shuffled[current113Index], shuffled[targetPos113]] = 
+        [shuffled[targetPos113], shuffled[current113Index]];
+    }
+    
+    setShuffledImages(shuffled);
   }, []);
 
   // Close modal on ESC key
