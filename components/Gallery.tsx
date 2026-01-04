@@ -19,7 +19,7 @@ const Gallery: React.FC = () => {
 
   // Shuffle images on component mount
   useEffect(() => {
-    const imagesToShow = GALLERY_IMAGES.slice(0, 6);
+    const imagesToShow = GALLERY_IMAGES.slice(0, 12);
     setShuffledImages(shuffleArray(imagesToShow));
   }, []);
 
