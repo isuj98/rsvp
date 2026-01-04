@@ -29,16 +29,14 @@ export const WEDDING_DETAILS = {
 };
 
 export const GALLERY_IMAGES = [
-  { url: 'images/11.jpg' },
-  { url: 'images/22.jpg' },
-  { url: 'images/33.jpg' },
-  { url: 'images/44.jpg' },
-  { url: 'images/55.jpg' },
-  { url: 'images/66.jpg' },
-  { url: 'images/77.jpg' },
-  { url: 'images/88.jpg' },
-  { url: 'images/99.jpg' },
-  { url: 'images/111.jpg' },
-  { url: 'images/112.jpg' },
-  { url: 'images/113.jpg' },
+  { url: 'images/0001.jpg' },
+  { url: 'images/0002.jpg' },
+  { url: 'images/0003.jpg' },
+  { url: 'images/0004.jpg' },
+  { url: 'images/0005.jpg' },
+  { url: 'images/0006.jpg' },
+  { url: 'images/0007.jpg' },
+  { url: 'images/0008.jpg' },
+  { url: 'images/0009.jpg' },
+  { url: 'images/0010.jpg' },
 ];

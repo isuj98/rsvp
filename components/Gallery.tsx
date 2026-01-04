@@ -19,7 +19,7 @@ const Gallery: React.FC = () => {
 
   // Shuffle images on component mount and ensure 88.jpg and 113.jpg are in left center positions
   useEffect(() => {
-    const imagesToShow = GALLERY_IMAGES.slice(0, 12);
+    const imagesToShow = GALLERY_IMAGES.slice(0, 10);
     const shuffled = shuffleArray(imagesToShow);
     
     // Left center positions in a 3-column grid: indices 3, 6 (left column of rows 2 and 3)
