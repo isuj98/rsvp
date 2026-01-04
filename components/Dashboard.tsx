@@ -78,6 +78,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   const filteredSubs = Array.isArray(submissions) ? submissions.filter(s => s.guestName.toLowerCase().includes(searchTerm.toLowerCase())) : [];
   const filteredGuests = Array.isArray(guestList) ? guestList.filter(g => g.toLowerCase().includes(searchTerm.toLowerCase())).sort() : [];
+  
+  // Calculate response counts
+  const acceptedCount = submissions.filter(s => s.isAttending === true).length;
+  const declinedCount = submissions.filter(s => s.isAttending === false).length;
+  const totalResponses = submissions.length;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] p-6 md:p-12 selection:bg-[#F1CBA4] selection:text-[#5C3D2E]">
@@ -109,6 +114,37 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
         {activeTab === 'submissions' ? (
           <Reveal>
+            {/* Response Counts Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-white border border-stone-100 shadow-sm rounded-sm p-8">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] uppercase tracking-[0.5em] font-black opacity-30">Total Responses</span>
+                  <svg className="w-6 h-6 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <p className="text-5xl font-serif-elegant italic" style={{ color: COLORS.dark }}>{totalResponses}</p>
+              </div>
+              <div className="bg-green-50 border border-green-100 shadow-sm rounded-sm p-8">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] uppercase tracking-[0.5em] font-black opacity-60" style={{ color: COLORS.dark }}>Accepted</span>
+                  <svg className="w-6 h-6 opacity-30" style={{ color: COLORS.dark }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-5xl font-serif-elegant italic text-green-700">{acceptedCount}</p>
+              </div>
+              <div className="bg-red-50 border border-red-100 shadow-sm rounded-sm p-8">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] uppercase tracking-[0.5em] font-black opacity-60" style={{ color: COLORS.dark }}>Declined</span>
+                  <svg className="w-6 h-6 opacity-30" style={{ color: COLORS.dark }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-5xl font-serif-elegant italic text-red-700">{declinedCount}</p>
+              </div>
+            </div>
+
             <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
                <div className="relative w-full max-w-md">
                  <input type="text" placeholder="Search by name..." className="bg-white border border-stone-100 pl-12 pr-6 py-5 rounded-full text-sm font-serif-elegant italic w-full focus:outline-none shadow-sm focus:ring-1 focus:ring-[#F1CBA4]" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
