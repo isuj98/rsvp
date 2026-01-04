@@ -15,6 +15,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [newGuestName, setNewGuestName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<{ guestName: string; message: string } | null>(null);
 
   useEffect(() => {
     refreshData();
@@ -79,8 +80,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const filteredSubs = Array.isArray(submissions) ? submissions.filter(s => s.guestName.toLowerCase().includes(searchTerm.toLowerCase())) : [];
   const filteredGuests = Array.isArray(guestList) ? guestList.filter(g => g.toLowerCase().includes(searchTerm.toLowerCase())).sort() : [];
   
-  // Calculate response counts
-  const acceptedCount = submissions.filter(s => s.isAttending === true).length;
+  // Calculate response counts - include companions in accepted count
+  const acceptedCount = submissions
+    .filter(s => s.isAttending === true)
+    .reduce((total, sub) => {
+      // Count the guest (1) + their companions
+      const companionCount = sub.companions?.length || 0;
+      return total + 1 + companionCount;
+    }, 0);
   const declinedCount = submissions.filter(s => s.isAttending === false).length;
   const totalResponses = submissions.length;
 
@@ -174,7 +181,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                          </td>
                          <td className="px-10 py-10">
                            <p className="font-serif-elegant italic text-3xl text-stone-900">{sub.guestName}</p>
-                           {sub.message && <p className="text-xs italic opacity-40 mt-2 max-w-xs truncate" title={sub.message}>"{sub.message}"</p>}
+                           {sub.message && (
+                             <button
+                               onClick={() => setSelectedMessage({ guestName: sub.guestName, message: sub.message })}
+                               className="text-xs italic opacity-40 mt-2 max-w-xs truncate hover:opacity-70 hover:underline transition-all text-left block cursor-pointer"
+                               title="Click to view full message"
+                             >
+                               "{sub.message}"
+                             </button>
+                           )}
                          </td>
                          <td className="px-10 py-10">
                            <div className="flex flex-wrap gap-2">
@@ -235,6 +250,46 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </Reveal>
         )}
       </div>
+
+      {/* Message Popup Modal */}
+      {selectedMessage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={() => setSelectedMessage(null)}
+        >
+          <div 
+            className="bg-white rounded-sm shadow-2xl max-w-2xl w-full p-10 md:p-16 relative border border-stone-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedMessage(null)}
+              className="absolute top-6 right-6 text-stone-300 hover:text-stone-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="mb-8">
+              <span className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30 block mb-4">Message from</span>
+              <h3 className="text-4xl md:text-5xl font-script" style={{ color: COLORS.dark }}>{selectedMessage.guestName}</h3>
+              <div className="w-12 h-[1px] bg-[#F1CBA4] mt-6"></div>
+            </div>
+            <div className="mt-10">
+              <p className="text-xl md:text-2xl font-serif-elegant italic leading-relaxed text-stone-700 whitespace-pre-wrap">
+                "{selectedMessage.message}"
+              </p>
+            </div>
+            <div className="mt-12 pt-8 border-t border-stone-100">
+              <button
+                onClick={() => setSelectedMessage(null)}
+                className="px-8 py-4 bg-stone-900 text-white rounded-full text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
