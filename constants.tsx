@@ -35,4 +35,10 @@ export const GALLERY_IMAGES = [
   { url: 'images/44.jpg' },
   { url: 'images/55.jpg' },
   { url: 'images/66.jpg' },
+  { url: 'images/77.jpg' },
+  { url: 'images/88.jpg' },
+  { url: 'images/99.jpg' },
+  { url: 'images/111.jpg' },
+  { url: 'images/112.jpg' },
+  { url: 'images/113.jpg' },
 ];

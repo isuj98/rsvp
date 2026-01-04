@@ -5,6 +5,23 @@ import Reveal from './Reveal';
 
 const Gallery: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const [shuffledImages, setShuffledImages] = useState<typeof GALLERY_IMAGES>([]);
+
+  // Shuffle images using Fisher-Yates algorithm
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Shuffle images on component mount
+  useEffect(() => {
+    const imagesToShow = GALLERY_IMAGES.slice(0, 6);
+    setShuffledImages(shuffleArray(imagesToShow));
+  }, []);
 
   // Close modal on ESC key
   useEffect(() => {
@@ -96,7 +113,7 @@ const Gallery: React.FC = () => {
 
           {/* Grid Area - Natural height grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 lg:gap-10">
-            {GALLERY_IMAGES.slice(0, 6).map((image, index) => (
+            {shuffledImages.map((image, index) => (
               <Reveal 
                 key={index} 
                 animation="reveal-scale" 
@@ -157,33 +174,37 @@ const Gallery: React.FC = () => {
             </button>
 
             {/* Image with protection overlay */}
-            <div className="relative max-w-full max-h-full">
-              <img 
-                src={GALLERY_IMAGES[selectedImage].url} 
-                alt={(GALLERY_IMAGES[selectedImage] as any).caption || `Gallery image ${selectedImage + 1}`}
-                className="max-w-full max-h-full object-contain rounded-sm shadow-2xl pointer-events-none select-none"
-                draggable={false}
-                onContextMenu={preventContextMenu}
-                onDragStart={preventDownload}
-                onSelectStart={preventDownload}
-              />
-              {/* Invisible overlay to prevent direct image access */}
-              <div 
-                className="absolute inset-0 z-10"
-                onContextMenu={preventContextMenu}
-                onDragStart={preventDownload}
-                onMouseDown={preventDownload}
-                onTouchStart={preventDownload}
-              />
-            </div>
+            {selectedImage !== null && shuffledImages[selectedImage] && (
+              <>
+                <div className="relative max-w-full max-h-full">
+                  <img 
+                    src={shuffledImages[selectedImage].url} 
+                    alt={(shuffledImages[selectedImage] as any).caption || `Gallery image ${selectedImage + 1}`}
+                    className="max-w-full max-h-full object-contain rounded-sm shadow-2xl pointer-events-none select-none"
+                    draggable={false}
+                    onContextMenu={preventContextMenu}
+                    onDragStart={preventDownload}
+                    onSelectStart={preventDownload}
+                  />
+                  {/* Invisible overlay to prevent direct image access */}
+                  <div 
+                    className="absolute inset-0 z-10"
+                    onContextMenu={preventContextMenu}
+                    onDragStart={preventDownload}
+                    onMouseDown={preventDownload}
+                    onTouchStart={preventDownload}
+                  />
+                </div>
 
-            {/* Caption */}
-            {(GALLERY_IMAGES[selectedImage] as any).caption && (
-              <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 md:px-8 py-3 md:py-4 rounded-sm">
-                <p className="text-white font-serif-elegant text-sm md:text-lg italic tracking-widest text-center">
-                  {(GALLERY_IMAGES[selectedImage] as any).caption}
-                </p>
-              </div>
+                {/* Caption */}
+                {(shuffledImages[selectedImage] as any).caption && (
+                  <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 md:px-8 py-3 md:py-4 rounded-sm">
+                    <p className="text-white font-serif-elegant text-sm md:text-lg italic tracking-widest text-center">
+                      {(shuffledImages[selectedImage] as any).caption}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
