@@ -22,7 +22,7 @@ const Hero: React.FC<HeroProps> = ({ onExplore }) => {
       </div>
 
       {/* Main Content Container - Centered with -1rem negative margin as requested (-mt-4) */}
-      <div className="relative -mt-6 z-20 w-full max-w-6xl px-8 flex flex-col items-center h-full text-white">
+      <div className="relative -mt-8 z-20 w-full max-w-6xl px-8 flex flex-col items-center h-full text-white">
         
         {/* Centered Names and Date */}
         <div className="text-center animate-fadeIn my-auto">
@@ -42,7 +42,7 @@ const Hero: React.FC<HeroProps> = ({ onExplore }) => {
             </h1>
           </div>
           
-          <p className="text-xl md:text-4xl mb-2 font-serif-elegant italic tracking-widest drop-shadow-lg font-light">
+          <p className="text-xl md:text-4xl mb-4 font-serif-elegant italic tracking-widest drop-shadow-lg font-light">
             {WEDDING_DETAILS.date}
           </p>
         </div>
