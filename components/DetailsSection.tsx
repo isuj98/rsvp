@@ -58,6 +58,14 @@ const DetailsSection: React.FC = () => {
           </Reveal>
         </div>
 
+        <Reveal delay={100}>
+          <img 
+            src="/images/details.jpg" 
+            alt="Wedding Details" 
+            className="w-full max-w-2xl mx-auto rounded-lg shadow-lg mb-20 object-cover object-center"
+          />
+        </Reveal>
+
         {/* Decorative flourish */}
         <Reveal delay={500} className="opacity-40">
            <svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
