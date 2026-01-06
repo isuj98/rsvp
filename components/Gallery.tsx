@@ -135,6 +135,19 @@ const Gallery: React.FC = () => {
             </Reveal>
           </div>
 
+          {/* Video Area: SEANKRISTINE.mp4 - lazy loaded, not affecting page load, no poster */}
+          <div className="my-12 flex items-center justify-center">
+            <video
+              className="w-full max-w-2xl rounded-xl shadow-2xl"
+              controls
+              preload="none"
+              style={{ background: '#ddd', minHeight: 360 }}
+            >
+              <source src="SEANKRISTINE.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
           {/* Grid Area - Natural height grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 lg:gap-10">
             {shuffledImages.map((image, index) => (
