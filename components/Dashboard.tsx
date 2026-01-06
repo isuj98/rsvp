@@ -9,6 +9,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<'submissions' | 'guestlist'>('submissions');
+  const [subTab, setSubTab] = useState<'all' | 'attending'>('all');
   const [submissions, setSubmissions] = useState<RSVPData[]>([]);
   const [guestList, setGuestList] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -159,6 +160,22 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </div>
           </div>
 
+          {/* Sub-tabs for RSVP Results (All Responses / Attending Only) */}
+          <div className="flex space-x-8 mb-10 border-b border-stone-100">
+            <button
+              className={`pb-3 text-[10px] uppercase tracking-[0.4em] font-bold relative transition-colors ${subTab === 'all' ? 'opacity-100 border-b-2 border-stone-800' : 'opacity-30'}`}
+              onClick={() => setSubTab('all')}
+            >
+              All Responses
+            </button>
+            <button
+              className={`pb-3 text-[10px] uppercase tracking-[0.4em] font-bold relative transition-colors ${subTab === 'attending' ? 'opacity-100 border-b-2 border-stone-800' : 'opacity-30'}`}
+              onClick={() => setSubTab('attending')}
+            >
+              Attending Only
+            </button>
+          </div>
+
           <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
             <div className="relative w-full max-w-md">
               <input
@@ -172,100 +189,101 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* ---- NEW TABLE FOR ACCEPTED GUESTS & COMPANIONS ---- */}
-          <div className="bg-white shadow-[0_40px_100px_rgba(0,0,0,0.06)] rounded-sm overflow-hidden border border-stone-100 mb-12">
-            <div className="p-8 pb-0">
-              <h3 className="font-serif-elegant italic text-2xl mb-2" style={{ color: COLORS.dark }}>All Attending (Guest & Companions)</h3>
-              <p className="text-[10px] uppercase tracking-[0.3em] font-black opacity-30 mb-4">View attendees with their plus ones</p>
-            </div>
-            <div className="overflow-x-auto custom-scroll">
-              <table className="w-full text-left">
-                <thead className="bg-stone-50 border-b border-stone-100">
-                  <tr>
-                    <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Guest</th>
-                    <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Companions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-50">
-                  {acceptedSubs.length === 0 && (
-                    <tr>
-                      <td className="px-10 py-6 italic text-stone-400" colSpan={2}>No attendees found.</td>
-                    </tr>
-                  )}
-                  {acceptedSubs.map((sub, i) => (
-                    <tr key={i} className="group hover:bg-stone-50/50">
-                      <td className="px-10 py-8">
-                        <p className="font-serif-elegant italic text-2xl text-stone-900">{sub.guestName}</p>
-                      </td>
-                      <td className="px-10 py-8">
-                        <div className="flex flex-wrap gap-2">
-                          {sub.companions && sub.companions.length > 0 ? (
-                            sub.companions.map((companion, j) => (
-                              <span key={j} className="text-[11px] bg-white border border-stone-200 px-3 py-1 rounded italic text-stone-500">{companion.name}</span>
-                            ))
-                          ) : (
-                            <span className="italic text-stone-300 text-[12px]">No companion</span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          {/* ---- END TABLE ---- */}
-
-          {/* Original table (all responses) */}
-          <div className="bg-white shadow-[0_40px_100px_rgba(0,0,0,0.06)] rounded-sm overflow-hidden border border-stone-100">
+          {subTab === 'attending' && (
+            <div className="bg-white shadow-[0_40px_100px_rgba(0,0,0,0.06)] rounded-sm overflow-hidden border border-stone-100 mb-12">
+              <div className="p-8 pb-0">
+                <h3 className="font-serif-elegant italic text-2xl mb-2" style={{ color: COLORS.dark }}>All Attending (Guest & Companions)</h3>
+                <p className="text-[10px] uppercase tracking-[0.3em] font-black opacity-30 mb-4">View attendees with their plus ones</p>
+              </div>
               <div className="overflow-x-auto custom-scroll">
                 <table className="w-full text-left">
                   <thead className="bg-stone-50 border-b border-stone-100">
                     <tr>
-                      <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Status</th>
                       <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Guest</th>
-                      <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Plus Ones</th>
-                      <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Contact</th>
-                      <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30 text-right">Delete</th>
+                      <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Companions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-50">
-                    {filteredSubs.map((sub, i) => (
+                    {acceptedSubs.length === 0 && (
+                      <tr>
+                        <td className="px-10 py-6 italic text-stone-400" colSpan={2}>No attendees found.</td>
+                      </tr>
+                    )}
+                    {acceptedSubs.map((sub, i) => (
                       <tr key={i} className="group hover:bg-stone-50/50">
-                        <td className="px-10 py-10">
-                          <span className={`px-4 py-1.5 rounded-full text-[9px] uppercase tracking-widest font-black ${sub.isAttending ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                            {sub.isAttending ? 'Attending' : 'No'}
-                          </span>
+                        <td className="px-10 py-8">
+                          <p className="font-serif-elegant italic text-2xl text-stone-900">{sub.guestName}</p>
                         </td>
-                        <td className="px-10 py-10">
-                          <p className="font-serif-elegant italic text-3xl text-stone-900">{sub.guestName}</p>
-                          {sub.message && (
-                            <button
-                              onClick={() => setSelectedMessage({ guestName: sub.guestName, message: sub.message })}
-                              className="text-xs italic opacity-40 mt-2 max-w-xs truncate hover:opacity-70 hover:underline text-left block cursor-pointer"
-                              title="Click to view full message"
-                            >
-                              "{sub.message}"
-                            </button>
-                          )}
-                        </td>
-                        <td className="px-10 py-10">
+                        <td className="px-10 py-8">
                           <div className="flex flex-wrap gap-2">
-                            {sub.companions?.map((c, j) => <span key={j} className="text-[10px] bg-white border border-stone-200 px-3 py-1 rounded italic text-stone-500">{c.name}</span>)}
+                            {sub.companions && sub.companions.length > 0 ? (
+                              sub.companions.map((companion, j) => (
+                                <span key={j} className="text-[11px] bg-white border border-stone-200 px-3 py-1 rounded italic text-stone-500">{companion.name}</span>
+                              ))
+                            ) : (
+                              <span className="italic text-stone-300 text-[12px]">No companion</span>
+                            )}
                           </div>
-                        </td>
-                        <td className="px-10 py-10 font-mono text-[11px] opacity-40">{sub.contactNumber}</td>
-                        <td className="px-10 py-10 text-right">
-                          <button onClick={() => handleDeleteSubmission(sub.guestName)} className="text-stone-200 hover:text-red-500 opacity-0 group-hover:opacity-100 p-3">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-          </div>
+            </div>
+          )}
+
+          {subTab === 'all' && (
+            <div className="bg-white shadow-[0_40px_100px_rgba(0,0,0,0.06)] rounded-sm overflow-hidden border border-stone-100">
+                <div className="overflow-x-auto custom-scroll">
+                  <table className="w-full text-left">
+                    <thead className="bg-stone-50 border-b border-stone-100">
+                      <tr>
+                        <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Status</th>
+                        <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Guest</th>
+                        <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Plus Ones</th>
+                        <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30">Contact</th>
+                        <th className="px-10 py-7 text-[10px] uppercase tracking-[0.4em] font-black opacity-30 text-right">Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-50">
+                      {filteredSubs.map((sub, i) => (
+                        <tr key={i} className="group hover:bg-stone-50/50">
+                          <td className="px-10 py-10">
+                            <span className={`px-4 py-1.5 rounded-full text-[9px] uppercase tracking-widest font-black ${sub.isAttending ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                              {sub.isAttending ? 'Attending' : 'No'}
+                            </span>
+                          </td>
+                          <td className="px-10 py-10">
+                            <p className="font-serif-elegant italic text-3xl text-stone-900">{sub.guestName}</p>
+                            {sub.message && (
+                              <button
+                                onClick={() => setSelectedMessage({ guestName: sub.guestName, message: sub.message })}
+                                className="text-xs italic opacity-40 mt-2 max-w-xs truncate hover:opacity-70 hover:underline text-left block cursor-pointer"
+                                title="Click to view full message"
+                              >
+                                "{sub.message}"
+                              </button>
+                            )}
+                          </td>
+                          <td className="px-10 py-10">
+                            <div className="flex flex-wrap gap-2">
+                              {sub.companions?.map((c, j) => <span key={j} className="text-[10px] bg-white border border-stone-200 px-3 py-1 rounded italic text-stone-500">{c.name}</span>)}
+                            </div>
+                          </td>
+                          <td className="px-10 py-10 font-mono text-[11px] opacity-40">{sub.contactNumber}</td>
+                          <td className="px-10 py-10 text-right">
+                            <button onClick={() => handleDeleteSubmission(sub.guestName)} className="text-stone-200 hover:text-red-500 opacity-0 group-hover:opacity-100 p-3">
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+          )}
         </TabPanel>
         <TabPanel show={activeTab === 'guestlist'} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="space-y-8">
