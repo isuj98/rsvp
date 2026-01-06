@@ -186,32 +186,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
         {/* Submissions tab & inner RSVP result tabs */}
         <div style={{ display: activeTab === 'submissions' ? 'block' : 'none' }}>
-          {/* RSVP Results Inner Tabs */}
-          <div className="mb-8 flex space-x-8 border-b border-stone-100">
-            <button
-              onClick={() => setRsvpSubTab('all')}
-              className={`pb-3 text-[10px] uppercase tracking-[0.4em] font-black transition-all relative ${
-                rsvpSubTab === 'all'
-                  ? 'opacity-100 border-b-2 border-stone-800'
-                  : 'opacity-30 border-b-2 border-transparent'
-              }`}
-              type="button"
-            >
-              All Guests
-            </button>
-            <button
-              onClick={() => setRsvpSubTab('attending')}
-              className={`pb-3 text-[10px] uppercase tracking-[0.4em] font-black transition-all relative ${
-                rsvpSubTab === 'attending'
-                  ? 'opacity-100 border-b-2 border-stone-800'
-                  : 'opacity-30 border-b-2 border-transparent'
-              }`}
-              type="button"
-            >
-              Attending Only
-            </button>
-          </div>
-
           {/* Response Counts Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="bg-white border border-stone-100 shadow-sm rounded-sm p-8">
@@ -294,6 +268,32 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 {declinedCount}
               </p>
             </div>
+          </div>
+
+          {/* RSVP Results Inner Tabs - moved here, above search bar and table */}
+          <div className="mb-8 flex space-x-8 border-b border-stone-100">
+            <button
+              onClick={() => setRsvpSubTab('all')}
+              className={`pb-3 text-[10px] uppercase tracking-[0.4em] font-black transition-all relative ${
+                rsvpSubTab === 'all'
+                  ? 'opacity-100 border-b-2 border-stone-800'
+                  : 'opacity-30 border-b-2 border-transparent'
+              }`}
+              type="button"
+            >
+              All Guests
+            </button>
+            <button
+              onClick={() => setRsvpSubTab('attending')}
+              className={`pb-3 text-[10px] uppercase tracking-[0.4em] font-black transition-all relative ${
+                rsvpSubTab === 'attending'
+                  ? 'opacity-100 border-b-2 border-stone-800'
+                  : 'opacity-30 border-b-2 border-transparent'
+              }`}
+              type="button"
+            >
+              Attending Only
+            </button>
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
@@ -585,3 +585,4 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 };
 
 export default Dashboard;
+
