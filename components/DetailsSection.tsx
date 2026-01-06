@@ -85,20 +85,21 @@ const DetailsSection: React.FC = () => {
 
         {/* PROGRAM SECTION BEGIN */}
         <Reveal delay={200}>
-          <div className="w-full max-w-3xl mx-auto bg-white/70 rounded-lg shadow-xl p-8 md:p-16 mb-16 border border-[#A67346]/10 text-left">
-            <h2 className="text-2xl md:text-3xl font-serif-elegant tracking-[0.2em] text-center mb-6 font-bold" style={{ color: COLORS.accent }}>
+          {/* Add font size utility to shrink all text in Program section */}
+          <div className="w-full max-w-3xl mx-auto bg-white/70 rounded-lg shadow-xl p-8 md:p-16 mb-16 border border-[#A67346]/10 text-left text-sm md:text-base">
+            <h2 className="text-xl md:text-2xl font-serif-elegant tracking-[0.2em] text-center mb-6 font-bold" style={{ color: COLORS.accent }}>
               Program
             </h2>
             <div className="space-y-10">
               {/* PART I */}
               <div>
-                <h3 className="text-xl md:text-2xl font-serif-elegant font-bold text-left mb-2" style={{ color: COLORS.dark }}>
+                <h3 className="text-lg md:text-xl font-serif-elegant font-bold text-left mb-2" style={{ color: COLORS.dark }}>
                   PART I
                 </h3>
                 <dl className="mb-4 space-y-1">
                   <div>
                     <dt className="font-bold inline">I. PROCESSIONAL</dt>{' '}
-                    <dd className="inline opacity-60 italic text-sm">(Song / Audio Piece)</dd>
+                    <dd className="inline opacity-60 italic text-xs md:text-sm">(Song / Audio Piece)</dd>
                   </div>
                   <div className="mt-2">
                     <dt className="font-bold inline">II. WELCOME &amp; INTRODUCTION</dt>{' '}
@@ -112,7 +113,7 @@ const DetailsSection: React.FC = () => {
                       III. SCRIPTURE READING &amp; OPENING PRAYER
                     </dt>{' '}
                     <dd className="inline font-serif-elegant">{formatName('ISAIAH MARK VALDEZ')}</dd>
-                    <div className="pl-5 text-[12px] opacity-70">
+                    <div className="pl-5 text-[11px] md:text-xs opacity-70">
                       Assoc. Minister<br />
                       Perth, Australia
                     </div>
@@ -124,7 +125,7 @@ const DetailsSection: React.FC = () => {
                   <div className="mt-2">
                     <dt className="font-bold inline">IV. OFFERATORY MESSAGE</dt>{' '}
                     <dd className="inline font-serif-elegant">{formatName('PTR. NIÑO MARPA')}</dd>
-                    <div className="pl-5 text-[12px] opacity-70">
+                    <div className="pl-5 text-[11px] md:text-xs opacity-70">
                       Head Pastor, Sariaya Locale
                     </div>
                   </div>
@@ -135,7 +136,7 @@ const DetailsSection: React.FC = () => {
                   <div className="mt-2">
                     <dt className="font-bold inline">V. MESSAGE</dt>{' '}
                     <dd className="inline font-serif-elegant">{formatName('PTR. RONALD R. RUIZ')}</dd>
-                    <div className="pl-5 text-[12px] opacity-70">
+                    <div className="pl-5 text-[11px] md:text-xs opacity-70">
                       Lucena Locale Head Pastor<br />
                       Quezon-Marinduque Coor.
                     </div>
@@ -144,19 +145,19 @@ const DetailsSection: React.FC = () => {
               </div>
               {/* PART II */}
               <div>
-                <h3 className="text-xl md:text-2xl font-serif-elegant font-bold text-left mb-2" style={{ color: COLORS.dark }}>
+                <h3 className="text-lg md:text-xl font-serif-elegant font-bold text-left mb-2" style={{ color: COLORS.dark }}>
                   PART II
                 </h3>
                 <dl className="mb-2 space-y-1">
                   <div>
                     <dt className="font-bold inline">VI. FIRST KNEELING</dt>
-                    <dd className="inline ml-1 opacity-60 italic text-sm">
+                    <dd className="inline ml-1 opacity-60 italic text-xs md:text-sm">
                       (Serenade: {formatName('Aubrey Ann A. Carneo')})
                     </dd>
                   </div>
                   <div className="mt-2">
                     <dt className="font-bold inline">VII. SECOND KNEELING</dt>
-                    <dd className="inline ml-1 opacity-60 italic text-sm">
+                    <dd className="inline ml-1 opacity-60 italic text-xs md:text-sm">
                       (Serenade: {formatName('Junnelle & Arma Amido')})
                     </dd>
                   </div>
@@ -165,7 +166,7 @@ const DetailsSection: React.FC = () => {
                   </div>
                   <div className="mt-2">
                     <dt className="font-bold inline">IX. SIGNING OF CONTRACT</dt>
-                    <dd className="inline ml-1 opacity-60 italic text-sm">
+                    <dd className="inline ml-1 opacity-60 italic text-xs md:text-sm">
                       (Serenade: {formatName('Ptr. Reshen V. Valdez')})
                     </dd>
                   </div>
@@ -185,13 +186,13 @@ const DetailsSection: React.FC = () => {
                 <div className="flex flex-col md:flex-row justify-center items-center gap-10">
                   <div className="flex-1 text-center">
                     <p className="text-xs uppercase tracking-[0.3em] font-bold opacity-50 mb-1">OFFICIATING MINISTER</p>
-                    <p className="font-serif-elegant text-lg font-bold" style={{ color: COLORS.dark }}>
+                    <p className="font-serif-elegant text-base md:text-lg font-bold" style={{ color: COLORS.dark }}>
                       {formatName('PTR. RONALD R. RUIZ')}
                     </p>
                   </div>
                   <div className="flex-1 text-center">
                     <p className="text-xs uppercase tracking-[0.3em] font-bold opacity-50 mb-1">MASTER OF CEREMONY</p>
-                    <p className="font-serif-elegant text-lg font-bold" style={{ color: COLORS.dark }}>
+                    <p className="font-serif-elegant text-base md:text-lg font-bold" style={{ color: COLORS.dark }}>
                       {formatName('Sis. AGATHA CRISTIE P. BARLAN')}
                     </p>
                   </div>
