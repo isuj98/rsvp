@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { COLORS } from '../constants';
 import { RSVPData } from '../types';
 
@@ -16,6 +16,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [newGuestName, setNewGuestName] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<{ guestName: string; message: string } | null>(null);
+
+  // For input focus restoration
+  const guestInputRef = useRef<HTMLInputElement | null>(null);
+  const searchInputRsvpRef = useRef<HTMLInputElement | null>(null);
+  const searchInputGuestRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     refreshData();
@@ -51,18 +56,31 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     }
   };
 
+  // --- FIX for input losing focus: do NOT call refreshData (which reloads the page state) immediately after updating new guest ---
+  // Delay the refresh until the request is confirmed, then restore focus.
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newGuestName.trim()) return;
-    
+    const trimmedName = newGuestName.trim();
+    if (!trimmedName) return;
     setLoading(true);
-    await fetch('/api/guests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newGuestName.trim() })
-    });
-    setNewGuestName('');
-    refreshData();
+
+    try {
+      await fetch('/api/guests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmedName })
+      });
+      setNewGuestName('');
+      // Ensure we restore focus after setState
+      setTimeout(() => {
+        guestInputRef.current?.focus();
+      }, 0);
+      refreshData();
+    } catch (_) {
+      //
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteGuest = async (name: string) => {
@@ -75,6 +93,30 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       });
       refreshData();
     }
+  };
+
+  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // For restoring focus, if necessary (not necessary for search, but just in case)
+  const handleRSVPSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setTimeout(() => {
+      searchInputRsvpRef.current?.focus();
+    }, 0);
+  };
+  const handleGuestSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setTimeout(() => {
+      searchInputGuestRef.current?.focus();
+    }, 0);
+  };
+  const handleNewGuestNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewGuestName(e.target.value);
+    setTimeout(() => {
+      guestInputRef.current?.focus();
+    }, 0);
   };
 
   const filteredSubs = Array.isArray(submissions) ? submissions.filter(s => s.guestName.toLowerCase().includes(searchTerm.toLowerCase())) : [];
@@ -183,7 +225,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 placeholder="Search by name..."
                 className="bg-white border border-stone-100 pl-12 pr-6 py-5 rounded-full text-sm font-serif-elegant italic w-full focus:outline-none shadow-sm focus:ring-1 focus:ring-[#F1CBA4]"
                 value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
+                onChange={handleRSVPSearchChange}
+                ref={searchInputRsvpRef}
+                autoComplete="off"
               />
               <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
@@ -289,12 +333,28 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <div className="space-y-8">
               <div className="bg-white p-12 border border-stone-100 shadow-2xl rounded-sm">
                 <h3 className="text-3xl font-serif-elegant italic mb-10">Authorize New Guest</h3>
-                <form onSubmit={handleAddGuest} className="space-y-10">
+                <form onSubmit={handleAddGuest} className="space-y-10" autoComplete="off">
                   <div className="space-y-4">
                     <label className="text-[10px] uppercase tracking-[0.5em] font-black opacity-30">Full Formal Name</label>
-                    <input type="text" required className="w-full border-b border-stone-200 py-4 focus:outline-none focus:border-[#F1CBA4] font-serif-elegant italic text-2xl bg-transparent" placeholder="Enter Name..." value={newGuestName} onChange={e => setNewGuestName(e.target.value)} />
+                    <input
+                      type="text"
+                      required
+                      className="w-full border-b border-stone-200 py-4 focus:outline-none focus:border-[#F1CBA4] font-serif-elegant italic text-2xl bg-transparent"
+                      placeholder="Enter Name..."
+                      value={newGuestName}
+                      onChange={handleNewGuestNameChange}
+                      ref={guestInputRef}
+                      autoComplete="off"
+                    />
                   </div>
-                  <button type="submit" disabled={loading} className="w-full py-6 text-white uppercase tracking-[0.5em] text-[10px] font-bold shadow-2xl hover:bg-stone-800 disabled:opacity-50" style={{ backgroundColor: COLORS.dark }}>Add to Registry</button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-6 text-white uppercase tracking-[0.5em] text-[10px] font-bold shadow-2xl hover:bg-stone-800 disabled:opacity-50"
+                    style={{ backgroundColor: COLORS.dark }}
+                  >
+                    Add to Registry
+                  </button>
                 </form>
               </div>
           </div>
@@ -307,7 +367,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-30">Authorized to RSVP via MongoDB</p>
                 </div>
                 <div className="relative w-full md:w-64">
-                  <input type="text" placeholder="Filter..." className="bg-stone-50 border-none px-8 py-3 rounded-full text-xs font-serif-elegant italic w-full" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                  <input
+                    type="text"
+                    placeholder="Filter..."
+                    className="bg-stone-50 border-none px-8 py-3 rounded-full text-xs font-serif-elegant italic w-full"
+                    value={searchTerm}
+                    onChange={handleGuestSearchChange}
+                    ref={searchInputGuestRef}
+                    autoComplete="off"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto custom-scroll max-h-[60vh] pr-4">
