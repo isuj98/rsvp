@@ -135,25 +135,18 @@ const Gallery: React.FC = () => {
             </Reveal>
           </div>
 
-          <div className="my-12 flex items-center justify-center select-none">
-            <iframe
-              src="https://drive.google.com/file/d/1vgPAKhkGQBf_qmt51qCaBQBU9lbzksXg/preview"
-              width="640"
-              height="480"
-              className="w-full max-w-2xl rounded-xl shadow-2xl pointer-events-auto"
-              style={{ background: '#ddd', minHeight: 360 }}
-              allow="autoplay; fullscreen"
-              allowFullScreen
-              sandbox="allow-scripts allow-same-origin allow-presentation"
-              title="Gallery Video"
-              referrerPolicy="no-referrer"
-            ></iframe>
-            {/* Prevent overlay for accidental clicks or right-click to Google Drive */}
-            <div
-              className="absolute w-full h-full top-0 left-0 rounded-xl"
-              style={{ pointerEvents: 'none' }}
-            />
-          </div>
+          <div className="relative w-full pb-[56.25%] max-w-2xl mx-auto rounded-xl shadow-2xl overflow-hidden">
+          <iframe
+            src="https://drive.google.com/file/d/1vgPAKhkGQBf_qmt51qCaBQBU9lbzksXg/preview"
+            className="absolute top-0 left-0 w-full h-full"
+            allow="autoplay; fullscreen"
+            allowFullScreen
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            title="Gallery Video"
+            referrerPolicy="no-referrer"
+          ></iframe>
+        </div>
+
 
           {/* Grid Area - Natural height grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 lg:gap-10">
