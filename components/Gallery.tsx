@@ -135,10 +135,6 @@ const Gallery: React.FC = () => {
             </Reveal>
           </div>
 
-          <div className="relative w-full pb-[56.25%] max-w-2xl mx-auto rounded-xl shadow-2xl overflow-hidden">
-            <iframe src="https://drive.google.com/file/d/1vgPAKhkGQBf_qmt51qCaBQBU9lbzksXg/preview" width="640" height="480"></iframe>
-          </div>
-
           {/* Grid Area - Natural height grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 lg:gap-10">
             {shuffledImages.map((image, index) => (
