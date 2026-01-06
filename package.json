@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx git lfs install && npx git lfs pull && bash ./scripts/vercel-build.sh && vite build",
+    "build": "npx vite build",
     "preview": "vite preview",
     "postinstall": "chmod +x node_modules/.bin/* 2>/dev/null || true"
   },
