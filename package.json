@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx vite build",
+    "build": "git lfs install && git lfs pull && vite build",
     "preview": "vite preview",
     "postinstall": "chmod +x node_modules/.bin/* 2>/dev/null || true"
   },
