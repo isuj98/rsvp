@@ -24,6 +24,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   useEffect(() => {
     refreshData();
+    // Only run once, so the data doesn't refresh on every render
+    // eslint-disable-next-line
   }, []);
 
   const refreshData = async () => {
@@ -52,12 +54,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ guestName: name })
       });
-      refreshData();
+      await refreshData();
+      setLoading(false);
     }
   };
 
-  // --- FIX for input losing focus: do NOT call refreshData (which reloads the page state) immediately after updating new guest ---
-  // Delay the refresh until the request is confirmed, then restore focus.
+  // --- FIX for input losing focus: Only refresh after POST confirmed and keep input handling minimal ---
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = newGuestName.trim();
@@ -71,11 +73,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         body: JSON.stringify({ name: trimmedName })
       });
       setNewGuestName('');
-      // Ensure we restore focus after setState
-      setTimeout(() => {
-        guestInputRef.current?.focus();
-      }, 0);
-      refreshData();
+      // Do NOT refocus manually or refresh immediately,
+      // setNewGuestName will keep input focused with the new value
+      await refreshData();
     } catch (_) {
       //
     } finally {
@@ -91,53 +91,38 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
       });
-      refreshData();
+      await refreshData();
+      setLoading(false);
     }
   };
 
-  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  // For restoring focus, if necessary (not necessary for search, but just in case)
+  // Rewritten input handlers: No unnecessary refocusing or setTimeouts
   const handleRSVPSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setTimeout(() => {
-      searchInputRsvpRef.current?.focus();
-    }, 0);
   };
   const handleGuestSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setTimeout(() => {
-      searchInputGuestRef.current?.focus();
-    }, 0);
   };
   const handleNewGuestNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewGuestName(e.target.value);
-    setTimeout(() => {
-      guestInputRef.current?.focus();
-    }, 0);
   };
 
   const filteredSubs = Array.isArray(submissions) ? submissions.filter(s => s.guestName.toLowerCase().includes(searchTerm.toLowerCase())) : [];
   const filteredGuests = Array.isArray(guestList) ? guestList.filter(g => g.toLowerCase().includes(searchTerm.toLowerCase())).sort() : [];
-  
+
   // Calculate response counts - include companions in accepted count
   const acceptedCount = submissions
     .filter(s => s.isAttending === true)
     .reduce((total, sub) => {
-      // Count the guest (1) + their companions
       const companionCount = sub.companions?.length || 0;
       return total + 1 + companionCount;
     }, 0);
   const declinedCount = submissions.filter(s => s.isAttending === false).length;
   const totalResponses = submissions.length;
 
-  // Helper function for tab display, replacing the Reveal animation component
   const TabPanel: React.FC<{ show: boolean; className?: string; children: React.ReactNode }> = ({ show, className, children }) =>
     show ? <div className={className}>{children}</div> : null;
 
-  // NEW: List of all "Attending" RSVPs and companions, filtered by search
   const acceptedSubs = Array.isArray(submissions)
     ? submissions.filter(s => s.isAttending === true && s.guestName.toLowerCase().includes(searchTerm.toLowerCase()))
     : [];
@@ -160,11 +145,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         </header>
 
         <nav className="flex space-x-12 mb-12 border-b border-stone-100 overflow-x-auto whitespace-nowrap scrollbar-hide">
-          <button onClick={() => {setActiveTab('submissions'); setSearchTerm('');}} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'submissions' ? 'opacity-100' : 'opacity-20'}`}>
+          <button onClick={() => { setActiveTab('submissions'); setSearchTerm(''); }} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'submissions' ? 'opacity-100' : 'opacity-20'}`}>
             RSVP Results
             {activeTab === 'submissions' && <div className="absolute bottom-0 left-0 w-full h-1 bg-stone-800 rounded-t-full"></div>}
           </button>
-          <button onClick={() => {setActiveTab('guestlist'); setSearchTerm('');}} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'guestlist' ? 'opacity-100' : 'opacity-20'}`}>
+          <button onClick={() => { setActiveTab('guestlist'); setSearchTerm(''); }} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'guestlist' ? 'opacity-100' : 'opacity-20'}`}>
             Guest Authorization
             {activeTab === 'guestlist' && <div className="absolute bottom-0 left-0 w-full h-1 bg-stone-800 rounded-t-full"></div>}
           </button>
