@@ -91,6 +91,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const declinedCount = submissions.filter(s => s.isAttending === false).length;
   const totalResponses = submissions.length;
 
+  // Always reveal content if active, even if user has scrolled
+  // We assume Reveal supports a prop 'forceShow' or 'show', fallback to always mount when activeTab is correct
+
   return (
     <div className="min-h-screen bg-[#FDFBF7] p-6 md:p-12 selection:bg-[#F1CBA4] selection:text-[#5C3D2E]">
       <div className="max-w-7xl mx-auto">
@@ -119,8 +122,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </button>
         </nav>
 
-        {activeTab === 'submissions' ? (
-          <Reveal>
+        {/* Always render (and always reveal) relevant section when active, regardless of scroll */}
+        <div style={{ display: activeTab === 'submissions' ? 'block' : 'none' }}>
+          <Reveal forceShow={activeTab === 'submissions'}>
             {/* Response Counts Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               <div className="bg-white border border-stone-100 shadow-sm rounded-sm p-8">
@@ -209,8 +213,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                </div>
             </div>
           </Reveal>
-        ) : (
-          <Reveal className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        </div>
+        <div style={{ display: activeTab === 'guestlist' ? 'block' : 'none' }}>
+          <Reveal forceShow={activeTab === 'guestlist'} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="space-y-8">
                <div className="bg-white p-12 border border-stone-100 shadow-2xl rounded-sm">
                   <h3 className="text-3xl font-serif-elegant italic mb-10">Authorize New Guest</h3>
@@ -248,7 +253,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </div>
             </div>
           </Reveal>
-        )}
+        </div>
       </div>
 
       {/* Message Popup Modal */}
