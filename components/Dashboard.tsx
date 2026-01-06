@@ -17,15 +17,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<{ guestName: string; message: string } | null>(null);
 
-  // For input focus restoration
+  // Input refs for accessibility, but focus management is minimal for compatibility
   const guestInputRef = useRef<HTMLInputElement | null>(null);
   const searchInputRsvpRef = useRef<HTMLInputElement | null>(null);
   const searchInputGuestRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     refreshData();
-    // Only run once, so the data doesn't refresh on every render
-    // eslint-disable-next-line
   }, []);
 
   const refreshData = async () => {
@@ -54,12 +52,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ guestName: name })
       });
-      await refreshData();
-      setLoading(false);
+      refreshData();
     }
   };
 
-  // --- FIX for input losing focus: Only refresh after POST confirmed and keep input handling minimal ---
+  // Ensure compatibility: minimal focus logic, rely on browser default behaviors for broadest device compatibility
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = newGuestName.trim();
@@ -73,9 +70,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         body: JSON.stringify({ name: trimmedName })
       });
       setNewGuestName('');
-      // Do NOT refocus manually or refresh immediately,
-      // setNewGuestName will keep input focused with the new value
-      await refreshData();
+      // Do not programmatically set focus - let device/browser handle as normal
+      refreshData();
     } catch (_) {
       //
     } finally {
@@ -91,38 +87,42 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
       });
-      await refreshData();
-      setLoading(false);
+      refreshData();
     }
   };
 
-  // Rewritten input handlers: No unnecessary refocusing or setTimeouts
+  // Plain simple search handlers for broad compatibility
   const handleRSVPSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
+
   const handleGuestSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
+
   const handleNewGuestNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewGuestName(e.target.value);
   };
 
   const filteredSubs = Array.isArray(submissions) ? submissions.filter(s => s.guestName.toLowerCase().includes(searchTerm.toLowerCase())) : [];
   const filteredGuests = Array.isArray(guestList) ? guestList.filter(g => g.toLowerCase().includes(searchTerm.toLowerCase())).sort() : [];
-
+  
   // Calculate response counts - include companions in accepted count
   const acceptedCount = submissions
     .filter(s => s.isAttending === true)
     .reduce((total, sub) => {
+      // Count the guest (1) + their companions
       const companionCount = sub.companions?.length || 0;
       return total + 1 + companionCount;
     }, 0);
   const declinedCount = submissions.filter(s => s.isAttending === false).length;
   const totalResponses = submissions.length;
 
+  // Helper function for tab display
   const TabPanel: React.FC<{ show: boolean; className?: string; children: React.ReactNode }> = ({ show, className, children }) =>
     show ? <div className={className}>{children}</div> : null;
 
+  // List of all "Attending" RSVPs and companions, filtered by search
   const acceptedSubs = Array.isArray(submissions)
     ? submissions.filter(s => s.isAttending === true && s.guestName.toLowerCase().includes(searchTerm.toLowerCase()))
     : [];
@@ -145,11 +145,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         </header>
 
         <nav className="flex space-x-12 mb-12 border-b border-stone-100 overflow-x-auto whitespace-nowrap scrollbar-hide">
-          <button onClick={() => { setActiveTab('submissions'); setSearchTerm(''); }} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'submissions' ? 'opacity-100' : 'opacity-20'}`}>
+          <button onClick={() => {setActiveTab('submissions'); setSearchTerm('');}} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'submissions' ? 'opacity-100' : 'opacity-20'}`}>
             RSVP Results
             {activeTab === 'submissions' && <div className="absolute bottom-0 left-0 w-full h-1 bg-stone-800 rounded-t-full"></div>}
           </button>
-          <button onClick={() => { setActiveTab('guestlist'); setSearchTerm(''); }} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'guestlist' ? 'opacity-100' : 'opacity-20'}`}>
+          <button onClick={() => {setActiveTab('guestlist'); setSearchTerm('');}} className={`pb-6 text-[11px] uppercase tracking-[0.5em] font-black relative ${activeTab === 'guestlist' ? 'opacity-100' : 'opacity-20'}`}>
             Guest Authorization
             {activeTab === 'guestlist' && <div className="absolute bottom-0 left-0 w-full h-1 bg-stone-800 rounded-t-full"></div>}
           </button>
@@ -213,6 +213,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 onChange={handleRSVPSearchChange}
                 ref={searchInputRsvpRef}
                 autoComplete="off"
+                inputMode="text"
+                aria-label="Search submissions by name"
+                spellCheck={true}
               />
               <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
@@ -320,8 +323,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <h3 className="text-3xl font-serif-elegant italic mb-10">Authorize New Guest</h3>
                 <form onSubmit={handleAddGuest} className="space-y-10" autoComplete="off">
                   <div className="space-y-4">
-                    <label className="text-[10px] uppercase tracking-[0.5em] font-black opacity-30">Full Formal Name</label>
+                    <label className="text-[10px] uppercase tracking-[0.5em] font-black opacity-30" htmlFor="new-guest-name-input">Full Formal Name</label>
                     <input
+                      id="new-guest-name-input"
                       type="text"
                       required
                       className="w-full border-b border-stone-200 py-4 focus:outline-none focus:border-[#F1CBA4] font-serif-elegant italic text-2xl bg-transparent"
@@ -330,6 +334,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       onChange={handleNewGuestNameChange}
                       ref={guestInputRef}
                       autoComplete="off"
+                      inputMode="text"
+                      aria-label="Full formal name"
+                      spellCheck={true}
                     />
                   </div>
                   <button
@@ -360,6 +367,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     onChange={handleGuestSearchChange}
                     ref={searchInputGuestRef}
                     autoComplete="off"
+                    inputMode="text"
+                    spellCheck={true}
+                    aria-label="Search guest registry"
                   />
                 </div>
               </div>
@@ -367,7 +377,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 {filteredGuests.map((name, i) => (
                   <div key={i} className="flex items-center justify-between p-5 bg-stone-50/50 rounded-sm group hover:bg-white hover:shadow-xl border border-transparent hover:border-stone-100/50">
                     <span className="text-base font-serif-elegant italic text-stone-800 tracking-wide font-medium">{name}</span>
-                    <button onClick={() => handleDeleteGuest(name)} className="text-stone-200 hover:text-red-400 opacity-0 group-hover:opacity-100 p-2">
+                    <button onClick={() => handleDeleteGuest(name)} className="text-stone-200 hover:text-red-400 opacity-0 group-hover:opacity-100 p-2" aria-label={`Delete ${name}`}>
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                   </div>
@@ -391,6 +401,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             <button
               onClick={() => setSelectedMessage(null)}
               className="absolute top-6 right-6 text-stone-300 hover:text-stone-600"
+              aria-label="Close message popup"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -410,6 +421,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               <button
                 onClick={() => setSelectedMessage(null)}
                 className="px-8 py-4 bg-stone-900 text-white rounded-full text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black"
+                aria-label="Close message popup"
               >
                 Close
               </button>
