@@ -135,17 +135,24 @@ const Gallery: React.FC = () => {
             </Reveal>
           </div>
 
-          {/* Video Area: SEANKRISTINE.mp4 - lazy loaded, not affecting page load, no poster */}
-          <div className="my-12 flex items-center justify-center">
-            <video
-              className="w-full max-w-2xl rounded-xl shadow-2xl"
-              controls
-              preload="none"
+          <div className="my-12 flex items-center justify-center select-none">
+            <iframe
+              src="https://drive.google.com/file/d/1vgPAKhkGQBf_qmt51qCaBQBU9lbzksXg/preview"
+              width="640"
+              height="480"
+              className="w-full max-w-2xl rounded-xl shadow-2xl pointer-events-auto"
               style={{ background: '#ddd', minHeight: 360 }}
-            >
-              <source src="SEANKRISTINE.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+              allow="autoplay; fullscreen"
+              allowFullScreen
+              sandbox="allow-scripts allow-same-origin allow-presentation"
+              title="Gallery Video"
+              referrerPolicy="no-referrer"
+            ></iframe>
+            {/* Prevent overlay for accidental clicks or right-click to Google Drive */}
+            <div
+              className="absolute w-full h-full top-0 left-0 rounded-xl"
+              style={{ pointerEvents: 'none' }}
+            />
           </div>
 
           {/* Grid Area - Natural height grid */}
