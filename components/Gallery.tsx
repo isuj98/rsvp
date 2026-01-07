@@ -135,6 +135,22 @@ const Gallery: React.FC = () => {
             </Reveal>
           </div>
 
+          <div className="flex justify-center mb-10 md:mb-16">
+            <div className="w-full max-w-[560px] aspect-video rounded-lg overflow-hidden shadow-lg">
+              <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/v-2Alecosw0?si=TPSNlPxeoKDLF8dA"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
+            </div>
+          </div>
+
           {/* Grid Area - Natural height grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 lg:gap-10">
             {shuffledImages.map((image, index) => (
